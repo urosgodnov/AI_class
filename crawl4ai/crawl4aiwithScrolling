@@ -11,7 +11,6 @@ async def css_extraction_imdb_reviews():
         "name": "IMDb Reviews", 
         "baseSelector": "article.user-review-item", # Find each review item container
         "fields": [
-            # Each item in this list defines one piece of data to extract
             {"name": "author",        "selector": "[data-testid='author-link']","type": "text"}, 
             {"name": "date",          "selector": ".review-date","type": "text"},
             {"name": "rating",        "selector": ".ipc-rating-star--rating","type": "text"},
