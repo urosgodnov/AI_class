@@ -1,0 +1,81 @@
+import asyncio
+import os
+from datetime import datetime
+from crawl4ai import AsyncWebCrawler, CrawlerRunConfig
+from crawl4ai.extraction_strategy import JsonCssExtractionStrategy
+import json
+import sys # Used for stderr printing on error
+
+async def css_extraction_imdb_reviews():
+    # --- Updated Schema Definition (based on <article> analysis) ---
+    schema = {
+        "name": "IMDb Reviews",  # Optional name for the schema
+        "baseSelector": "article.user-review-item", # Find each review item container
+        "fields": [
+            # Each item in this list defines one piece of data to extract
+            {"name": "author",        "selector": "[data-testid='author-link']","type": "text"}, 
+            {"name": "date",          "selector": ".review-date","type": "text"},
+            {"name": "rating",        "selector": ".ipc-rating-star--rating","type": "text"},
+            {"name": "title",         "selector": "[data-testid='review-summary'] a","type": "text"},
+            {"name": "review_text",   "selector": ".ipc-html-content-inner-div","type": "text"},
+            {"name": "helpful_votes", "selector": ".ipc-voting__label__count--up","type": "text"},
+            {"name": "unhelpful_votes","selector": ".ipc-voting__label__count--down","type": "text"}
+        ]
+    }
+
+    # --- Setup ---
+    results_folder = os.path.join(os.getcwd(), "crawl_results_imdb_all_single")
+    os.makedirs(results_folder, exist_ok=True)
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    extraction_strategy = JsonCssExtractionStrategy(schema)
+    session_id = f"imdb_reviews_all_single_{timestamp}" 
+
+
+    url = "https://www.imdb.com/title/tt6208148/reviews/?ref_=tt_ururv_sm" 
+
+    # --- JavaScript to click the "All" button ---
+    js_click_all = "document.querySelector('span.chained-see-more-button button.ipc-see-more__button')?.click();"
+
+    all_reviews = [] # Initialize empty list to store results
+
+    print(f"Starting scrape for: {url}") # Minimal output
+
+    async with AsyncWebCrawler() as crawler:
+        run_config = CrawlerRunConfig(
+            extraction_strategy=extraction_strategy,
+            verbose=False, 
+            session_id=session_id,
+            js_code=js_click_all,
+            delay_before_return_html=60
+        )
+
+        result = await crawler.arun(url=url, config=run_config)
+
+        if result.success:
+                reviews_data = json.loads(result.extracted_content)
+                all_reviews.extend(reviews_data)          
+        elif not result.success:
+             print(f"Error: Extraction failed: {result.error_message}", file=sys.stderr)
+        elif not result.extracted_content:
+             print("Warning: No content extracted. 'All' button issue or insufficient wait_time?", file=sys.stderr)
+        else:
+            print("I have no idea why it doesnt work!")
+
+    # --- Final Output - Saving as JSON ---
+    json_filename = os.path.join(results_folder, f"imdb_reviews_all_{timestamp}.json")
+    if all_reviews:
+        try:
+            with open(json_filename, "w", encoding="utf-8") as json_file:
+                json.dump(all_reviews, json_file, ensure_ascii=False, indent=4)
+            print(f"Successfully saved {len(all_reviews)} reviews to {json_filename}") # Minimal output
+        except Exception as e:
+            print(f"Error: Failed to save reviews to JSON file: {e}", file=sys.stderr)
+    else:
+         print("Warning: No reviews were collected. Skipping JSON file creation.", file=sys.stderr)
+
+
+if __name__ == "__main__":
+    asyncio.run(css_extraction_imdb_reviews())
+
+
