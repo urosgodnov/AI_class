@@ -7,7 +7,6 @@ import json
 import sys
 
 async def css_extraction_imdb_reviews():
-    # --- Updated Schema Definition (based on <article> analysis) ---
     schema = {
         "name": "IMDb Reviews", 
         "baseSelector": "article.user-review-item", # Find each review item container
@@ -38,7 +37,7 @@ async def css_extraction_imdb_reviews():
 
     all_reviews = [] # Initialize empty list to store results
 
-    print(f"Starting scrape for: {url}") # Minimal output
+    print(f"Starting scrape for: {url}") 
 
     async with AsyncWebCrawler() as crawler:
         run_config = CrawlerRunConfig(
