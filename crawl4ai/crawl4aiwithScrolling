@@ -9,7 +9,7 @@ import sys # Used for stderr printing on error
 async def css_extraction_imdb_reviews():
     # --- Updated Schema Definition (based on <article> analysis) ---
     schema = {
-        "name": "IMDb Reviews",  # Optional name for the schema
+        "name": "IMDb Reviews", 
         "baseSelector": "article.user-review-item", # Find each review item container
         "fields": [
             # Each item in this list defines one piece of data to extract
@@ -23,7 +23,7 @@ async def css_extraction_imdb_reviews():
         ]
     }
 
-    # --- Setup ---
+
     results_folder = os.path.join(os.getcwd(), "crawl_results_imdb_all_single")
     os.makedirs(results_folder, exist_ok=True)
 
@@ -34,7 +34,6 @@ async def css_extraction_imdb_reviews():
 
     url = "https://www.imdb.com/title/tt6208148/reviews/?ref_=tt_ururv_sm" 
 
-    # --- JavaScript to click the "All" button ---
     js_click_all = "document.querySelector('span.chained-see-more-button button.ipc-see-more__button')?.click();"
 
     all_reviews = [] # Initialize empty list to store results
@@ -47,7 +46,7 @@ async def css_extraction_imdb_reviews():
             verbose=False, 
             session_id=session_id,
             js_code=js_click_all,
-            delay_before_return_html=60
+            delay_before_return_html=60 # when scrolling, this is very imortant to wait for the page
         )
 
         result = await crawler.arun(url=url, config=run_config)
@@ -62,7 +61,7 @@ async def css_extraction_imdb_reviews():
         else:
             print("I have no idea why it doesnt work!")
 
-    # --- Final Output - Saving as JSON ---
+
     json_filename = os.path.join(results_folder, f"imdb_reviews_all_{timestamp}.json")
     if all_reviews:
         try:
