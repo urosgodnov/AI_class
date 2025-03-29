@@ -4,7 +4,7 @@ from datetime import datetime
 from crawl4ai import AsyncWebCrawler, CrawlerRunConfig
 from crawl4ai.extraction_strategy import JsonCssExtractionStrategy
 import json
-import sys # Used for stderr printing on error
+import sys
 
 async def css_extraction_imdb_reviews():
     # --- Updated Schema Definition (based on <article> analysis) ---

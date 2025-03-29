@@ -14,7 +14,7 @@ async def basic_crawl():
     - Crawls quotes.toscrape.com
     - Saves the markdown output to a timestamped file
     """
-    # Create results folder if it doesn't exist
+
     results_folder = os.path.join(os.getcwd(), "crawl_results")
     os.makedirs(results_folder, exist_ok=True)
     
@@ -46,5 +46,4 @@ async def basic_crawl():
 
 # Entry point of the script
 if __name__ == "__main__":
-    # Run the async function using asyncio
     asyncio.run(basic_crawl())
