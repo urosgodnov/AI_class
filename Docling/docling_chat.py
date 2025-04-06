@@ -1,5 +1,6 @@
 import streamlit as st
 import lancedb
+import numpy as np
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -30,7 +31,7 @@ def get_context(query: str, table, num_results: int = 5) -> str:
         source_parts = []
         if filename:
             source_parts.append(filename)
-        if page_numbers:
+        if isinstance(page_numbers, (list, tuple, set, np.ndarray)) and len(page_numbers) > 0:
             source_parts.append(f"p. {', '.join(str(p) for p in page_numbers)}")
 
         source = f"\nSource: {' - '.join(source_parts)}"

@@ -15,6 +15,7 @@ from lancedb.embeddings import get_registry
 from lancedb.pydantic import LanceModel, Vector
 from openai import OpenAI
 from tokenizer_custom import OpenAITokenizerWrapper
+import PyPDF2
 
 """
 LanceDB is a fast, local, and scalable vector database built on top of Apache Arrow. 
@@ -42,8 +43,14 @@ doc_converter = DocumentConverter(
     }
 )
 
+# read pdf file from disk
+
 converter = DocumentConverter()
-result = doc_converter.convert("https://arxiv.org/pdf/2408.09869")
+# result = doc_converter.convert("https://arxiv.org/pdf/2408.09869")
+
+
+result = doc_converter.convert("guidlines.pdf")
+
 
 chunker = HybridChunker(
     tokenizer=tokenizer,
